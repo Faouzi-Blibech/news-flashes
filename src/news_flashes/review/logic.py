@@ -50,7 +50,7 @@ def can_approve(
     if flash.status != FlashStatus.DRAFT:
         return False, (
             f"Le flash doit être en statut DRAFT pour être approuvé "
-            f"(statut actuel : {flash.status.value})."
+            f"(statut actuel : {FlashStatus(flash.status).value})."
         )
 
     if not approver or not approver.strip():
