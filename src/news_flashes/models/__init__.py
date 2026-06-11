@@ -1,1 +1,1 @@
-"""Data models package — shared contract for Signals and Voice & Delivery."""
+"""Data models sub-package."""

@@ -5,27 +5,30 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "news-flashes"
 version = "0.1.0"
-description = "Semi-automated FX-hedging advisory flash pipeline"
+description = "FX advisory news flash system — draft, review, send"
 requires-python = ">=3.11"
 dependencies = [
-    "sqlmodel",
-    "pydantic-settings",
-    "anthropic",
-    "streamlit",
-    "jinja2",
-    "matplotlib",
-    "httpx",
-    "markdown",
-    "apscheduler",
-    "python-dotenv",
+    "sqlmodel>=0.0.21",
+    "pydantic-settings>=2.3",
+    "httpx>=0.27",
+    "apscheduler>=3.10",
+    "jinja2>=3.1",
+    "anthropic>=0.28",
+    "python-dotenv>=1.0",
+    "streamlit>=1.35",
+    "matplotlib>=3.9",
+    "markdown>=3.6",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-mock"]
+dev = [
+    "pytest>=8.2",
+    "pytest-mock>=3.14",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]

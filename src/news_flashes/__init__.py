@@ -1,1 +1,1 @@
-"""news_flashes — FX-hedging advisory flash pipeline."""
+"""news-flashes: FX advisory news flash system."""
