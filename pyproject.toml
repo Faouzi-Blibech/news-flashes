@@ -16,10 +16,12 @@ dependencies = [
     "matplotlib",
     "httpx",
     "markdown",
+    "apscheduler",
+    "python-dotenv",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "pytest-mock"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

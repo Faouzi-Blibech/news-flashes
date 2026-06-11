@@ -1,48 +1,48 @@
-"""Database engine, session factory, and table initialisation."""
+"""SQLite engine, session factory, and DB initialisation."""
+
+from __future__ import annotations
 
 from contextlib import contextmanager
 from typing import Generator
 
 from sqlmodel import Session, SQLModel, create_engine
 
-from news_flashes.config import settings
-
-# Import schema so SQLModel.metadata knows about all tables before create_all.
-import news_flashes.models.schema as _schema  # noqa: F401
-
-engine = create_engine(
-    f"sqlite:///{settings.db_path}",
-    echo=False,
-    connect_args={"check_same_thread": False},
-)
+from news_flashes.config import get_settings
 
 
-def init_db() -> None:
-    """Create all tables if they do not exist yet."""
-    SQLModel.metadata.create_all(engine)
+def _make_engine(database_url: str | None = None):
+    url = database_url or get_settings().database_url
+    # connect_args is only needed for SQLite to allow multi-threaded access
+    connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
+    return create_engine(url, connect_args=connect_args)
 
 
-def get_session() -> Session:
-    """Return a new :class:`~sqlmodel.Session` bound to the shared engine.
+# Module-level engine — created once at import time using the configured URL.
+# Tests override this by calling init_db(engine=...) with a temp engine.
+engine = _make_engine()
 
-    Callers should use it as a context manager::
+
+def init_db(engine=None) -> None:
+    """Create all tables that are not yet present.
+
+    Pass an explicit *engine* to target a different database (e.g. tests).
+    """
+    import news_flashes.models.db as _self  # local import avoids shadowing the param
+    target = engine or _self.engine
+    SQLModel.metadata.create_all(target)
+
+
+@contextmanager
+def get_session(engine=None) -> Generator[Session, None, None]:
+    """Yield a SQLModel Session and close it afterwards.
+
+    Usage::
 
         with get_session() as session:
             session.add(flash)
             session.commit()
     """
-    return Session(engine)
-
-
-@contextmanager
-def session_scope() -> Generator[Session, None, None]:
-    """Context manager that commits on success and rolls back on error."""
-    session = Session(engine)
-    try:
+    import news_flashes.models.db as _self  # local import avoids shadowing the param
+    target = engine or _self.engine
+    with Session(target) as session:
         yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()

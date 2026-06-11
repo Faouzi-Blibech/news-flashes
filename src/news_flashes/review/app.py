@@ -62,7 +62,7 @@ _STATUS_COLORS: dict[FlashStatus, str] = {
 
 def _badge(status: FlashStatus) -> str:
     color = _STATUS_COLORS.get(status, "#888888")
-    label = _STATUS_LABELS.get(status, status.value)
+    label = _STATUS_LABELS.get(status, FlashStatus(status).value)
     return f'<span style="background:{color};color:white;padding:2px 8px;border-radius:4px;font-size:0.85em;">{label}</span>'
 
 
@@ -105,7 +105,7 @@ if not flashes:
 
 # Build display labels for the selectbox
 def _flash_label(f: Flash) -> str:
-    status_label = _STATUS_LABELS.get(f.status, f.status.value)
+    status_label = _STATUS_LABELS.get(f.status, FlashStatus(f.status).value)
     subject = f.subject or (f.get_event().title if f.event else f"Flash #{f.id}")
     ts = f.created_at.strftime("%d/%m/%Y %H:%M") if f.created_at else ""
     return f"[{status_label}] {subject}  ({ts})"

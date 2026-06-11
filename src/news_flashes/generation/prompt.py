@@ -147,12 +147,16 @@ def build_user_message(event: Event, market_context: MarketContext) -> str:
     if market_context.quotes:
         lines.append("## Cotations de marché actuelles\n")
         for symbol, q in market_context.quotes.items():
-            sign = "+" if q.change >= 0 else ""
-            lines.append(
-                f"- **{symbol}** : {q.level:.4f} "
-                f"({sign}{q.change:.4f} sur la séance, "
-                f"relevé à {q.asof.strftime('%H:%M UTC')})"
-            )
+            detail = f"- **{symbol}** : {q.level:.4f}"
+            if q.change is not None:
+                sign = "+" if q.change >= 0 else ""
+                detail += f" ({sign}{q.change:.4f} sur la séance"
+                if q.asof is not None:
+                    detail += f", relevé à {q.asof.strftime('%H:%M UTC')}"
+                detail += ")"
+            elif q.asof is not None:
+                detail += f" (relevé à {q.asof.strftime('%H:%M UTC')})"
+            lines.append(detail)
         lines.append("")
 
     # ---- History / trend block ---------------------------------------------
